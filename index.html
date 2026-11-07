@@ -6,39 +6,45 @@
 <title>Standoff 2 gold</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-:root{--bg:#0e1528;--card:#151d36;--tile:#1c2644;--line:#26325a;--text:#eef1fb;--muted:#8f9ac0;--accent:#2f35ff;--price:#6f7bff;--gold:#f5b942}
+:root{--bg:#0e1528;--card:#151d36;--tile:#1c2644;--line:#26325a;--text:#eef1fb;--muted:#8f9ac0;--accent:#2f35ff;--price:#7c83ff;--gold:#f5a623}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:16px 16px 110px}
-.hero{display:flex;align-items:center;gap:16px;background:var(--card);border:1px solid var(--line);border-radius:26px;padding:18px}
+.hero{display:flex;align-items:center;gap:16px;background:var(--card);border:1px solid var(--line);border-radius:26px;padding:20px}
 .logo,.fb{width:84px;height:84px;border-radius:20px;flex:none;object-fit:cover}
-.fb{display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#2a1f3d,#7a1f2b);font-weight:800;font-size:26px;letter-spacing:1px}
+.fb{display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#2a1f3d,#7a1f2b);font-weight:800;font-size:28px}
 h1{font-size:26px;margin:0}
 .sub{color:var(--muted);font-size:14px;margin:4px 0 0}
 h2{font-size:14px;color:var(--muted);font-weight:600;margin:24px 4px 10px;letter-spacing:.3px}
 .chips{display:flex;gap:8px;flex-wrap:wrap}
 .chip{background:var(--tile);border:0;border-radius:999px;color:var(--text);font:inherit;padding:10px 18px;cursor:pointer}
 .box{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:14px}
-input{width:100%;background:var(--tile);border:1px solid var(--line);border-radius:999px;color:var(--text);font:inherit;padding:15px 20px;outline:none}
+input{width:100%;background:var(--tile);border:1px solid var(--line);border-radius:999px;color:var(--text);font:inherit;padding:16px 20px;outline:0}
 input:focus{border-color:var(--accent)}
 .hint{color:var(--muted);font-size:13px;margin:10px 8px 0}
 .err{color:#ff7a7a}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.pack{display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--line);border-radius:20px;padding:12px;color:var(--text);text-align:left;font:inherit;cursor:pointer}
+.pack{display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--line);border-radius:20px;padding:12px;color:var(--text);font:inherit;text-align:left;cursor:pointer}
 .ic{width:46px;height:46px;border-radius:12px;background:#262b3f;display:flex;align-items:center;justify-content:center;flex:none}
 .ic svg{width:34px;height:34px}
 .pack b{display:block;font-size:16px}
 .pack span{color:var(--price);font-size:15px}
 .pack.on{border-color:var(--gold);background:#242339}
 .pack:focus-visible,.chip:focus-visible,#buy:focus-visible{outline:2px solid var(--gold)}
-.bar{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,var(--bg) 35%)}
-#buy{width:100%;border:0;border-radius:999px;background:var(--accent);color:#fff;font:600 18px inherit;font-family:inherit;padding:17px;cursor:pointer}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--bg) 70%,transparent)}
+#buy{width:100%;border:0;border-radius:999px;background:var(--accent);color:#fff;font:600 18px inherit;font-family:inherit;padding:16px;cursor:pointer}
 #buy:disabled{opacity:.45;cursor:default}
 </style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-<linearGradient id="gt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe9a3"/><stop offset="1" stop-color="#f2a93b"/></linearGradient>
-<symbol id="gold" viewBox="0 0 64 64"><polygon points="6,38 22,22 58,22 42,38" fill="url(#gt)"/><polygon points="6,38 42,38 42,52 6,52" fill="#e0912a"/><polygon points="42,38 58,22 58,36 42,52" fill="#b86f18"/></symbol>
+<linearGradient id="gt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe9a3"/><stop offset="1" stop-color="#f7b733"/></linearGradient>
+<linearGradient id="gf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7b733"/><stop offset="1" stop-color="#e08a1e"/></linearGradient>
+<symbol id="gold" viewBox="0 0 64 64">
+<polygon points="6,38 22,22 58,22 42,38" fill="url(#gt)"/>
+<polygon points="6,38 42,38 42,54 6,54" fill="url(#gf)"/>
+<polygon points="42,38 58,22 58,38 42,54" fill="#c97a1a"/>
+<polygon points="12,40 30,40 30,43 12,43" fill="#fff" opacity=".35"/>
+</symbol>
 </defs></svg>
 
 <div class="hero">
@@ -66,11 +72,12 @@ input:focus{border-color:var(--accent)}
 <script>
 const BOT_USERNAME = "so2donat_uz_bot";
 const PACKS = [[100,17000],[200,34000],[300,50500],[500,83000],[1000,140500],[3000,375000]];
+const HINT = "ID’ni o’yin profilidan nusxalang. Noto’g’ri ID’ga tushgan goldni qaytarib bo’lmaydi.";
 const tg = window.Telegram ? Telegram.WebApp : null;
 if (tg){ tg.ready(); tg.expand(); tg.setHeaderColor("#0e1528"); tg.setBackgroundColor("#0e1528"); }
 
 const $ = id => document.getElementById(id);
-const fmt = n => n.toLocaleString("ru-RU").replace(/\u00a0/g," ") + " so’m";
+const fmt = n => n.toLocaleString("ru-RU").replace(/\u00a0/g, " ") + " so’m";
 let chosen = null;
 
 const logo = $("logo"), fb = $("fb");
@@ -80,18 +87,34 @@ PACKS.forEach(([gold, price]) => {
   const b = document.createElement("button");
   b.className = "pack";
   b.innerHTML = '<span class="ic"><svg><use href="#gold"/></svg></span><div><b>' + gold + ' Golds</b><span>' + fmt(price) + '</span></div>';
-  b.onclick = () => { chosen = gold; [...$("grid").children].forEach(x => x.classList.toggle("on", x === b)); update(); };
+  b.onclick = () => {
+    chosen = gold;
+    [...$("grid").children].forEach(x => x.classList.toggle("on", x === b));
+    update();
+  };
   $("grid").appendChild(b);
 });
 
-function getIds(){ try { return JSON.parse(localStorage.getItem("so2ids") || "[]"); } catch(e){ return []; } }
+function getIds(){
+  try { return JSON.parse(localStorage.getItem("so2ids") || "[]"); } catch(e){ return []; }
+}
 function saveId(id){
-  try { const l = [id, ...getIds().filter(x => x !== id)].slice(0,3); localStorage.setItem("so2ids", JSON.stringify(l)); } catch(e){}
+  try {
+    const l = [id, ...getIds().filter(x => x !== id)].slice(0, 3);
+    localStorage.setItem("so2ids", JSON.stringify(l));
+  } catch(e){}
 }
 function showSaved(){
-  const l = getIds(); $("savedWrap").hidden = !l.length; $("saved").innerHTML = "";
-  l.forEach(id => { const c = document.createElement("button"); c.className = "chip"; c.textContent = id;
-    c.onclick = () => { $("pid").value = id; update(); }; $("saved").appendChild(c); });
+  const l = getIds();
+  $("savedWrap").hidden = !l.length;
+  $("saved").innerHTML = "";
+  l.forEach(id => {
+    const c = document.createElement("button");
+    c.className = "chip";
+    c.textContent = id;
+    c.onclick = () => { $("pid").value = id; update(); };
+    $("saved").appendChild(c);
+  });
 }
 showSaved();
 
@@ -99,13 +122,14 @@ function validId(){ return /^\d{6,12}$/.test($("pid").value.trim()); }
 function update(){
   const bad = $("pid").value && !validId();
   $("hint").classList.toggle("err", bad);
-  if (bad) $("hint").textContent = "ID faqat raqamlardan iborat bo’lishi kerak (6–12 ta).";
+  $("hint").textContent = bad ? "ID faqat raqamlardan iborat bo’lishi kerak (6-12 ta)." : HINT;
   $("buy").disabled = !(chosen && validId());
 }
 $("pid").addEventListener("input", update);
 
 $("buy").onclick = () => {
-  const id = $("pid").value.trim(); saveId(id);
+  const id = $("pid").value.trim();
+  saveId(id);
   const link = "https://t.me/" + BOT_USERNAME + "?start=o_" + chosen + "_" + id;
   if (tg){ tg.openTelegramLink(link); tg.close(); } else { location.href = link; }
 };
