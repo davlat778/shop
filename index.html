@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Standoff 2 gold</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--bg:#0e1528;--card:#161f38;--line:#26325a;--text:#eef1fb;--muted:#8f9ac0;--accent:#3a3cff;--gold:#f5b942}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:16px 16px 110px}
+h1{font-size:24px;margin:0 0 2px}
+.sub{color:var(--muted);margin:0 0 20px}
+h2{font-size:15px;color:var(--muted);font-weight:600;margin:22px 0 8px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px}
+input{width:100%;background:#1c2748;border:1px solid var(--line);border-radius:14px;color:var(--text);font:inherit;padding:14px;outline:none}
+input:focus{border-color:var(--accent)}
+.hint{color:var(--muted);font-size:13px;margin:8px 4px 0}
+.err{color:#ff7a7a}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pack{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:12px;color:var(--text);text-align:left;font:inherit;cursor:pointer}
+.pack b{display:block;font-size:17px}
+.pack span{color:#8d92ff;font-size:15px}
+.pack.on{border-color:var(--gold);background:#2a2740}
+.pack:focus-visible,#buy:focus-visible{outline:2px solid var(--gold)}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,var(--bg) 35%)}
+#buy{width:100%;border:0;border-radius:16px;background:var(--accent);color:#fff;font:600 17px inherit;font-family:inherit;padding:16px;cursor:pointer}
+#buy:disabled{opacity:.45;cursor:default}
+</style>
+</head>
+<body>
+<h1>Standoff 2</h1>
+<p class="sub">Gold ID orqali tushadi, parol kerak emas</p>
+
+<h2>O’yinchi ID</h2>
+<div class="box">
+  <input id="pid" inputmode="numeric" autocomplete="off" placeholder="O’yinchi ID kiriting" maxlength="12">
+  <p class="hint" id="hint">ID’ni o’yin profilidan nusxalang. Noto’g’ri ID’ga tushgan goldni qaytarib bo’lmaydi.</p>
+</div>
+
+<h2>Gold paketini tanlang</h2>
+<div class="grid" id="grid"></div>
+
+<div class="bar"><button id="buy" disabled>Sotib olish</button></div>
+
+<script>
+const BOT_USERNAME = "so2donat_uz_bot";
+const PACKS = [[100,18500],[200,37500],[300,56000],[500,90500],[1000,153000],[3000,410000]];
+const tg = window.Telegram ? Telegram.WebApp : null;
+if (tg){ tg.ready(); tg.expand(); tg.setHeaderColor("#0e1528"); tg.setBackgroundColor("#0e1528"); }
+
+const fmt = n => n.toLocaleString("ru-RU").replace(/\u00a0/g," ") + " so’m";
+let chosen = null;
+const grid = document.getElementById("grid"), pid = document.getElementById("pid"),
+      buy = document.getElementById("buy"), hint = document.getElementById("hint");
+
+PACKS.forEach(([gold, price]) => {
+  const b = document.createElement("button");
+  b.className = "pack";
+  b.innerHTML = "<b>" + gold + " Golds</b><span>" + fmt(price) + "</span>";
+  b.onclick = () => { chosen = gold; [...grid.children].forEach(x => x.classList.toggle("on", x === b)); update(); };
+  grid.appendChild(b);
+});
+
+function validId(){ return /^\d{6,12}$/.test(pid.value.trim()); }
+function update(){
+  const bad = pid.value && !validId();
+  hint.classList.toggle("err", bad);
+  if (bad) hint.textContent = "ID faqat raqamlardan iborat bo’lishi kerak (6–12 ta).";
+  buy.disabled = !(chosen && validId());
+}
+pid.addEventListener("input", update);
+
+buy.onclick = () => {
+  const link = "https://t.me/" + BOT_USERNAME + "?start=o_" + chosen + "_" + pid.value.trim();
+  if (tg){ tg.openTelegramLink(link); tg.close(); } else { location.href = link; }
+};
+</script>
+</body>
+</html>
