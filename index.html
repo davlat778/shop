@@ -130,6 +130,13 @@ h1{font-size:21px}
 .center p{font-size:15px}
 .nav button{font-size:10.5px}
 button:focus-visible{outline:2px solid var(--gold)}
+.modal{position:fixed;inset:0;background:rgba(5,8,20,.75);display:flex;align-items:center;justify-content:center;padding:20px;z-index:30}
+.modal[hidden]{display:none}
+.mbox{width:100%;max-width:420px;background:var(--card);border:1.5px solid #6b5a2e;border-radius:26px;padding:22px 18px;text-align:center}
+.mico{width:54px;height:54px;border-radius:50%;background:#ffe9c7;color:#f0a000;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:28px;margin:0 auto 14px}
+.mbox h4{margin:0 0 10px;font-size:18px;font-weight:700}
+.mbox p{margin:0 0 18px;color:#a4abc3;font-size:14px;font-weight:600}
+.mbox .chip{width:100%;margin-top:10px;padding:14px;font-weight:600;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -209,6 +216,15 @@ button:focus-visible{outline:2px solid var(--gold)}
   <button class="on" data-go="home"><svg><use href="#i-home"/></svg>Bosh sahifa</button>
   <button data-go="methods"><svg><use href="#i-wallet"/></svg>Hamyon</button>
 </nav>
+<div class="modal" id="nofunds" hidden>
+  <div class="mbox">
+    <div class="mico">!</div>
+    <h4>Balansingizda mablag’ yetarli emas</h4>
+    <p id="nfText"></p>
+    <button class="goldbtn" id="nfTop">To’ldirish</button>
+    <button class="chip" id="nfClose">Yopish</button>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -272,7 +288,19 @@ function toBot(param){
   const link = "https://t.me/" + BOT_USERNAME + "?start=" + param;
   if (tg){ tg.openTelegramLink(link); tg.close(); } else location.href = link;
 }
-$("buy").onclick = () => { const id = $("pid").value.trim(); saveId(id); toBot("o_" + chosen + "_" + id); };
+$("buy").onclick = () => {
+  const id = $("pid").value.trim();
+  const price = (PACKS.find(p => p[0] === chosen) || [0, 0])[1];
+  const have = parseInt(q.get("b") || "0", 10) || 0;
+  if (q.has("b") && have < price){
+    $("nfText").textContent = "Narxi: " + fmt(price) + " so’m. Balansingiz: " + fmt(have) + " so’m. Yetishmaydi: " + fmt(price - have) + " so’m.";
+    $("nofunds").hidden = false;
+    return;
+  }
+  saveId(id); toBot("o_" + chosen + "_" + id);
+};
+$("nfClose").onclick = () => { $("nofunds").hidden = true; };
+$("nfTop").onclick = () => { $("nofunds").hidden = true; show("methods"); };
 
 function checkAmt(){ $("toPay").disabled = !(parseInt($("amount").value || "0", 10) >= 10000); }
 document.querySelectorAll(".preset").forEach(b => b.onclick = () => { $("amount").value = b.dataset.amt; checkAmt(); });
