@@ -527,6 +527,7 @@ $("papply").onclick = () => {
   try { localStorage.setItem("promo", promo); } catch(e){} paintPromo();
 };
 paintPromo();
+if (q.get("go") === "giveaway") show("giveaway");
 </script>
 </body>
 </html>
