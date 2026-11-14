@@ -218,18 +218,6 @@ button:focus-visible{outline-color:#b86bff}
 .bd{border-radius:999px;padding:5px 12px;font-size:11px;font-weight:700}
 .bd.d{background:#0f3a24;color:#6fe3a1}.bd.p{background:#3a2d0a;color:#ffd45a}.bd.r{background:#3a1018;color:#ff7a7a}
 .empty{text-align:center;color:var(--muted);padding:40px 10px;font-size:13px}
-.idrow{display:flex;gap:10px;align-items:center}
-.idrow[hidden],.idok[hidden]{display:none}
-.idrow input{flex:1;min-width:0}
-.chk{flex:none;border:0;border-radius:999px;background:var(--accent);color:#fff;font-weight:600;font-size:14px;padding:16px 18px;cursor:pointer}
-.chk:disabled{opacity:.45}
-.chk[hidden]{display:none}
-.idok{display:flex;align-items:center;gap:12px;border:1.5px solid #1f7a4d;background:rgba(20,130,80,.16);border-radius:999px;padding:8px 18px 8px 8px}
-.idok i{flex:none;width:42px;height:42px;border-radius:50%;background:#1f9d62;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:22px;font-weight:700}
-.idok div{flex:1;min-width:0}
-.idok b{display:block;font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.idok small{color:#6fe3a1;font-size:13px}
-.idok button{flex:none;background:none;border:0;color:var(--muted);font:inherit;font-size:13px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -318,7 +306,7 @@ button:focus-visible{outline-color:#b86bff}
   <div class="hero"><div class="art" id="gart"><svg><use href="#art"/></svg></div><div><h1 id="gname">Standoff 2</h1><p class="sub" id="gsub">Gold ID orqali tushadi</p></div></div>
   <div id="savedWrap" hidden><h2>SAQLANGAN IDLAR</h2><div class="chips" id="saved"></div></div>
   <h2 id="idh">O’YINCHI ID</h2>
-  <div class="box"><div class="idrow" id="idrow"><input id="pid" inputmode="numeric" autocomplete="off" placeholder="O’yinchi ID kiriting" maxlength="13"><button class="chk" id="chk" disabled>Tekshirish</button></div><div class="idok" id="idok" hidden><i>✓</i><div><b id="nick"></b><small id="nickid"></small></div><button id="chg">O’zgartirish</button></div><p class="hint" id="hint">ID’ni o’yin profilidan nusxalang. Noto’g’ri ID’ga tushgan goldni qaytarib bo’lmaydi.</p></div>
+  <div class="box"><input id="pid" inputmode="numeric" autocomplete="off" placeholder="O’yinchi ID kiriting" maxlength="13"><p class="hint" id="hint">ID’ni o’yin profilidan nusxalang. Noto’g’ri ID’ga tushgan goldni qaytarib bo’lmaydi.</p></div>
   <div id="joinNote" hidden>🎁 Promo faol: bu xarid sizni sovrinli o’yinga qo’shadi</div>
   <h2>MAHSULOTNI TANLANG</h2>
   <div class="grid" id="grid"></div>
@@ -381,7 +369,6 @@ button:focus-visible{outline-color:#b86bff}
 
 <script>
 const BOT_USERNAME = "easypin_bot";
-const API = "https://id154.vps.doliyev.uz";   // ID tekshirish serveri (bot ishlayotgan VPS)
 // To'lov kartasi (bot.py dagi CARD bilan bir xil bo'lsin). Faqat karta raqami va ism, boshqa ma'lumot yozmang!
 const CARDS = [["9860 3566 3242 5563", "Baxtiyor Samatov"]];
 // PROMO KODLAR: shu kodlar bilan xarid qilgan odam 2 haftalik o’yinda qatnashadi (narx o’zgarmaydi).
@@ -497,7 +484,6 @@ function openGame(key){
   $("pid").value = ""; const tgg = !!g.tg; $("pid").inputMode = tgg ? "text" : "numeric"; $("pid").maxLength = tgg ? 33 : 13;
   $("pid").placeholder = tgg ? "Telegram username (@ siz)" : "O’yinchi ID kiriting"; $("idh").textContent = tgg ? "TELEGRAM USERNAME" : "O’YINCHI ID";
   $("starsWrap").hidden = !g.stars; $("starsN").value = ""; $("starsHint").textContent = "Kamida 50 ta. 1 Star ≈ " + STAR_SOM + " so’m";
-  resetCheck(); $("chk").hidden = tgg;
   renderPacks(); showSaved(); update(); show("so2");
 }
 document.addEventListener("click", e => { const b = e.target.closest("[data-game]"); if (b) openGame(b.dataset.game); });
@@ -506,48 +492,16 @@ function getIds(){ try { return JSON.parse(localStorage.getItem(idsKey()) || "[]
 function saveId(id){ try { localStorage.setItem(idsKey(), JSON.stringify([id, ...getIds().filter(x => x !== id)].slice(0,3))); } catch(e){} }
 function showSaved(){
   const l = getIds(); $("savedWrap").hidden = !l.length; $("saved").innerHTML = "";
-  l.forEach(id => { const c = document.createElement("button"); c.className = "chip"; c.textContent = id; c.onclick = () => { $("pid").value = id; onPid(); }; $("saved").appendChild(c); });
+  l.forEach(id => { const c = document.createElement("button"); c.className = "chip"; c.textContent = id; c.onclick = () => { $("pid").value = id; update(); }; $("saved").appendChild(c); });
 }
 function validId(){ const v = $("pid").value.trim(); return GAMES[cur].tg ? /^@?[A-Za-z][A-Za-z0-9_]{4,31}$/.test(v) : /^\d{6,13}$/.test(v); }
-let idState = "none", idName = "", idChecked = "", chkTimer = null, chkSeq = 0;
-function paintId(){
-  const ok = idState === "ok";
-  $("idrow").hidden = ok; $("idok").hidden = !ok;
-  if (ok){ $("nick").textContent = idName; $("nickid").textContent = $("pid").value.trim(); }
-}
-function resetCheck(){ chkSeq++; clearTimeout(chkTimer); idState = "none"; idName = ""; idChecked = ""; paintId(); }
-async function runCheck(){
-  if (GAMES[cur].tg || !validId()) return;
-  const id = $("pid").value.trim(), game = cur, seq = ++chkSeq;
-  idState = "checking"; update();
-  let st = "na", name = "";
-  try {
-    const r = await fetch(API + "/check", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({game, id, initData: tg ? tg.initData : ""})});
-    const d = await r.json();
-    if (d && d.ok && d.name){ st = "ok"; name = d.name; } else if (d && d.reason === "invalid") st = "bad";
-  } catch(e){}
-  if (seq !== chkSeq || game !== cur || $("pid").value.trim() !== id) return;
-  idState = st; idName = name; idChecked = id; paintId(); update();
-}
 function update(){
-  const tgg = !!GAMES[cur].tg, bad = $("pid").value && !validId();
-  const idBad = !tgg && idState === "bad";
-  $("hint").classList.toggle("err", !!bad || idBad);
-  $("hint").textContent = bad ? (tgg ? "Username 5–32 belgi: harf, raqam va _ (harf bilan boshlanadi)." : "ID faqat raqamlardan iborat bo’lishi kerak (6–13 ta).")
-    : idBad ? "Bu ID topilmadi. Tekshirib, qayta kiriting."
-    : (!tgg && idState === "na" && validId()) ? "ID tekshirib bo’lmadi. ID’ni diqqat bilan o’zingiz tekshiring."
-    : (!tgg && idState === "checking") ? "Tekshirilmoqda…" : hintText();
-  $("chk").disabled = tgg || !validId() || idState === "checking";
-  $("buy").disabled = !(chosen && validId() && (tgg || idState === "ok" || idState === "na"));
+  const bad = $("pid").value && !validId();
+  $("hint").classList.toggle("err", bad);
+  $("hint").textContent = bad ? (GAMES[cur].tg ? "Username 5–32 belgi: harf, raqam va _ (harf bilan boshlanadi)." : "ID faqat raqamlardan iborat bo’lishi kerak (6–13 ta).") : hintText();
+  $("buy").disabled = !(chosen && validId());
 }
-function onPid(){
-  if ($("pid").value.trim() !== idChecked){ idState = "none"; idName = ""; }
-  clearTimeout(chkTimer); update();
-  if (!GAMES[cur].tg && validId() && idState === "none") chkTimer = setTimeout(runCheck, 700);
-}
-$("chk").onclick = () => { idState = "none"; runCheck(); };
-$("chg").onclick = () => { resetCheck(); $("pid").focus(); update(); };
-$("pid").addEventListener("input", onPid);
+$("pid").addEventListener("input", update);
 $("starsN").addEventListener("input", e => {
   e.target.value = e.target.value.replace(/\D/g, "");
   const n = parseInt(e.target.value || "0", 10);
